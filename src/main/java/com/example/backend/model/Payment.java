@@ -4,30 +4,22 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-@Table(
-        name = "payment",
-        schema = "ms_payment",
-        uniqueConstraints = {
-                @UniqueConstraint(name = "uk_payment_idempotency_key", columnNames = "idempotency_key")
-        },
-        indexes = {
-                @Index(name = "idx_payment_order_id", columnList = "order_id"),
-                @Index(name = "idx_payment_external_id", columnList = "external_id")
-        }
-)
+@Table(name = "payment")
 public class Payment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "external_id")
+    private String externalId; //добавить колонку в таблицу , подумать о реализации идемподентности (kafka , redis)
 
     @Column(name = "amount_rub", nullable = false, precision = 19, scale = 2)
     private BigDecimal amountRub;
@@ -41,6 +33,6 @@ public class Payment {
     private User recipient;
 
     @Column(name = "booking_date", nullable = false, updatable = false)
-    private Instant bookingDate;
+    private LocalDateTime bookingDate;
 
 }

@@ -1,3 +1,28 @@
 spring:
   application:
     name: payment-component
+
+  datasource:
+    url: jdbc:h2:mem:payment-db
+    username: ar
+    password:
+
+  jpa:
+    defer-datasource-initialization: true
+    open-in-view: false
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+courses:
+  rub: ${RUB_VAR:1}
+  dol: ${DOL_VAR:70}
+  eur: ${EUR_VAR:80}

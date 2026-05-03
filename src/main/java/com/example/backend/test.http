@@ -1,0 +1,9 @@
+POST http://localhost:8080/api/payments
+Content-Type: application/json
+
+{
+  "payerId": 1,
+  "recipientId": 2,
+  "amount": 1,
+  "currencyCode": "USD"
+}
