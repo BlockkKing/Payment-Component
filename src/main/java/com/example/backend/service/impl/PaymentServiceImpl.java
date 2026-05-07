@@ -7,7 +7,6 @@ import com.example.backend.mapper.PaymentMapper;
 import com.example.backend.model.Fee;
 import com.example.backend.model.Payment;
 import com.example.backend.model.User;
-import com.example.backend.repository.FeeRepository;
 import com.example.backend.repository.PaymentRepository;
 import com.example.backend.service.*;
 import lombok.RequiredArgsConstructor;
@@ -27,10 +26,9 @@ public class PaymentServiceImpl implements PaymentService {
     private final ExchangeRateService exchangeRateService;
     private final FeePolicyService feePolicyService;
     private final PaymentRepository paymentRepository;
-    private final FeeRepository feeRepository;
+    private final FeeService feeService;
     private final ApplicationEventPublisher eventPublisher;
     private final PaymentMapper paymentMapper;
-    private final NotificationService notificationService;
 
     @Override
     @Transactional
@@ -55,18 +53,10 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setBookingDate(LocalDateTime.now());
         payment = paymentRepository.save(payment);
         // 7. Сохранение комиссии
-        Fee feeEntity = saveFee(payer, payment, fee);
+        Fee feeEntity = feeService.createFee(payer, payment, fee);
 
         eventPublisher.publishEvent(new PaymentCreatedEvent(payment.getId()));
         return paymentMapper.toResponse(payment, feeEntity);
-    }
-
-    private Fee saveFee(User payer, Payment payment, BigDecimal feeAmount) {
-        Fee fee = new Fee();
-        fee.setUser(payer);
-        fee.setPayment(payment);
-        fee.setAmount(feeAmount);
-        return feeRepository.save(fee); // вынести репозиторий
     }
 
     private void validateUsers(User payer, User recipient) {
@@ -76,9 +66,8 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private BigDecimal convertToRub(BigDecimal amount, String currency) {
-        BigDecimal rate = exchangeRateService.rateForToday(currency, "RUB");
+        BigDecimal rate = exchangeRateService.getExchangeRate(currency, "RUB");
         return amount.multiply(rate)
                 .setScale(2, RoundingMode.HALF_UP);
-    } // Конвертация к целевой курсу при помощи новой переменной из переменных окружения
-    //Исправь и rateForToday
+    }
 }
