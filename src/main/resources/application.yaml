@@ -22,7 +22,14 @@ spring:
       enabled: true
       path: /h2-console
 
-courses:
+rates:
   rub: ${RUB_VAR:1}
-  dol: ${DOL_VAR:70}
-  eur: ${EUR_VAR:80}
+  usd: ${USD_VAR:75}
+  eur: ${EUR_VAR:89}
+
+fees:
+  threshold-low: ${THRESHOLD_LOW:1000}
+  threshold-high: ${THRESHOLD_HIGH:5000}
+  rate-low: ${RATE_LOW:0.015}
+  rate-mid: ${RATE_MID:0.01}
+  rate-high: ${RATE_HIGH:0.005}

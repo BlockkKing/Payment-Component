@@ -9,7 +9,6 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "fee")
 public class Fee {
 
@@ -27,5 +26,11 @@ public class Fee {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "payment_id", nullable = false)
     private Payment payment;
+
+    public Fee(User user, Payment payment, BigDecimal amount) {
+        this.user = user;
+        this.payment = payment;
+        this.amount = amount;
+    }
 
 }

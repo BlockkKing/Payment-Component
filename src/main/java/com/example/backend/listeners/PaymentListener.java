@@ -16,7 +16,6 @@ public class PaymentListener {
     private final NotificationService notificationService;
 
     //Сообщение должно появиться в консоли
-
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handle(PaymentCreatedEvent event) {
         log.debug("Создан платёж с id = {}", event.paymentId()); // если не будет сообщения, добавить в yml уровень логирования через указание пакета, добавь debug
