@@ -6,13 +6,15 @@ import com.example.backend.listeners.events.PaymentCreatedEvent;
 import com.example.backend.mapper.PaymentMapper;
 import com.example.backend.model.Fee;
 import com.example.backend.model.Payment;
+import com.example.backend.model.PaymentOutbox;
 import com.example.backend.model.User;
+import com.example.backend.repository.PaymentOutboxRepository;
 import com.example.backend.repository.PaymentRepository;
 import com.example.backend.service.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.ObjectMapper;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -27,8 +29,9 @@ public class PaymentServiceImpl implements PaymentService {
     private final FeePolicyService feePolicyService;
     private final PaymentRepository paymentRepository;
     private final FeeService feeService;
-    private final ApplicationEventPublisher eventPublisher;
     private final PaymentMapper paymentMapper;
+    private final PaymentOutboxRepository paymentOutboxRepository;
+    private final ObjectMapper objectMapper;
 
     @Override
     @Transactional
@@ -55,7 +58,23 @@ public class PaymentServiceImpl implements PaymentService {
         // 7. Сохранение комиссии
         Fee feeEntity = feeService.createFee(payer, payment, fee);
 
-        eventPublisher.publishEvent(new PaymentCreatedEvent(payment.getId()));
+        //eventPublisher.publishEvent(new PaymentCreatedEvent(payment.getId()));
+        PaymentCreatedEvent event = new PaymentCreatedEvent(
+                payment.getId(),
+                payer.getId(),
+                recipient.getId(),
+                amountRub
+        );
+
+        PaymentOutbox outbox = PaymentOutbox.builder()
+                .aggregateId(payment.getId())
+                .eventType("PAYMENT_CREATED")
+                .payload(objectMapper.writeValueAsString(event))
+                .attempts(0)
+                .build();
+
+        paymentOutboxRepository.save(outbox);
+
         return paymentMapper.toResponse(payment, feeEntity);
     }
 

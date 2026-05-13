@@ -1,4 +1,9 @@
 package com.example.backend.listeners.events;
 
-public record PaymentCreatedEvent (Long paymentId) {
+import java.math.BigDecimal;
+
+public record PaymentCreatedEvent (Long paymentId,
+                                    Long payerId,
+                                   Long recipientId,
+                                   BigDecimal amountRub) {
 }
