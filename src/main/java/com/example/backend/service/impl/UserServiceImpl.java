@@ -6,6 +6,10 @@ import com.example.backend.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+// findById() делает реальный SQL-запрос сразу
+// getReferenceById(), возвращает объект-заглушку (прокси - содержит только id), т.е. делает это лениво.
+// Загрузит данные из БД только при первом обращении.
+
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -16,10 +20,4 @@ public class UserServiceImpl implements UserService {
     public User findById(Long id) {
         return userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Пользователь не найден: " + id));
     }
-
-    // Посмотреть тему прокси. Отличия findById от getById
-    // findById() делает реальный SQL-запрос сразу
-    // getReferenceById(), возвращает объект-заглушку (прокси - содержит только id), т.е. делает это лениво.
-    // Загрузит данные из БД только при первом обращении.
-
 }

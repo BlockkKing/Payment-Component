@@ -1,6 +1,6 @@
 package com.example.backend.config;
 
-import com.example.backend.enumeration.Currency;
+import com.example.backend.enumeration.CurrencyEnum;
 import com.example.backend.service.ExchangeRateService;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
@@ -14,7 +14,7 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
     @Override
     public BigDecimal getExchangeRate(String fromCurrency, String toCurrency) {
         validate(fromCurrency, toCurrency);
-        return Currency.from(fromCurrency, toCurrency).getRate();
+        return CurrencyEnum.from(fromCurrency, toCurrency).getRate();
     }
 
     //Проверка вход-выход курса на null
