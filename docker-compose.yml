@@ -1,6 +1,16 @@
-version: '3.8'
-
 services:
+  payment-db:
+    image: postgres:15
+    container_name: component-postgresql
+    restart: always
+    ports:
+      - "5440:5432"
+    environment:
+      POSTGRES_DB: payment_component
+      POSTGRES_USER: payment_user
+      POSTGRES_PASSWORD: payment_pswd
+    volumes:
+      - payment_data:/var/lib/postgresql/data
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
@@ -28,3 +38,6 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
 
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+volumes:
+  payment_data:

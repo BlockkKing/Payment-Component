@@ -1,42 +1,38 @@
 spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5440/payment_component
+    username: payment_user
+    password: payment_pswd
+    driver-class-name: org.postgresql.Driver
+
   kafka:
     bootstrap-servers: localhost:9092
 
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-
-      consumer:
-        group-id: payment-group
-        auto-offset-reset: earliest
-        key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-        value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-
-        properties:
-          spring.json.trusted.packages: "*"
-
   application:
     name: payment-component
-
-  datasource:
-    url: jdbc:h2:mem:payment-db
-    username: ar
-    password:
 
   jpa:
     defer-datasource-initialization: true
     open-in-view: false
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
     show-sql: true
     properties:
       hibernate:
-        format_sql: true
+        default_schema: ms_payment_component
 
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+  liquibase:
+    enabled: true
+    change-log: classpath:db/database_ms_payment-changelog.xml
+    default-schema: ms_payment_component
+    drop-first: false
+
+kafka:
+  payment-events-topic: ${PAYMENT_EVENTS_TOPIC:payment-events}
+
+outbox:
+  publisher:
+    fixed-delay-ms: 2000
 
 rates:
   rub: ${RUB_VAR:1}

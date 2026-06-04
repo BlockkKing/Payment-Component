@@ -1,20 +1,31 @@
 package com.example.backend.config;
 
-import com.example.backend.enumeration.CurrencyEnum;
 import com.example.backend.service.ExchangeRateService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 
 @Service
+@RequiredArgsConstructor
 public class ExchangeRateServiceImpl implements ExchangeRateService {
-//Создание ключа, но при ENUM он больше не нужен
-//    private String buildKey(String from, String to) {return from + "_" + to;}
+
+    private final RatesProperties ratesProperties;
 
     //Получение актуального курса валют
     @Override
     public BigDecimal getExchangeRate(String fromCurrency, String toCurrency) {
-        validate(fromCurrency, toCurrency);
-        return CurrencyEnum.from(fromCurrency, toCurrency).getRate();
+        return getRate(fromCurrency, toCurrency);
+    }
+
+    public BigDecimal getRate(String from, String to) {
+        validate(from, to);
+        String rate = (from + "_" + to).toUpperCase();
+        return switch (rate) {
+            case "RUB_RUB" -> ratesProperties.getRub();
+            case "USD_RUB" -> ratesProperties.getUsd();
+            case "EUR_RUB" -> ratesProperties.getEur();
+            default -> throw new IllegalArgumentException("Неизвестная конвертация: " + from + " -> " + to);
+        };
     }
 
     //Проверка вход-выход курса на null

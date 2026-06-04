@@ -6,13 +6,15 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+
 @Component
 @RequiredArgsConstructor
 @Getter
 @Setter
 @ConfigurationProperties(prefix = "rates")
 public class RatesProperties {
-        private String rub;
-        private String usd;
-        private String eur;
+        private BigDecimal rub;
+        private BigDecimal usd;
+        private BigDecimal eur;
 }

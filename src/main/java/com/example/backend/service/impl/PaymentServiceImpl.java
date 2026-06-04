@@ -2,7 +2,6 @@ package com.example.backend.service.impl;
 
 import com.example.backend.dto.PaymentRequest;
 import com.example.backend.dto.PaymentResponse;
-import com.example.backend.listeners.events.PaymentCreatedEvent;
 import com.example.backend.mapper.PaymentMapper;
 import com.example.backend.model.Fee;
 import com.example.backend.model.Payment;
@@ -14,11 +13,14 @@ import com.example.backend.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tools.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -58,24 +60,35 @@ public class PaymentServiceImpl implements PaymentService {
         // 7. Сохранение комиссии
         Fee feeEntity = feeService.createFee(payer, payment, fee);
 
-        //eventPublisher.publishEvent(new PaymentCreatedEvent(payment.getId()));
-        PaymentCreatedEvent event = new PaymentCreatedEvent(
-                payment.getId(),
-                payer.getId(),
-                recipient.getId(),
-                amountRub
-        );
-
-        PaymentOutbox outbox = PaymentOutbox.builder()
-                .aggregateId(payment.getId())
-                .eventType("PAYMENT_CREATED")
-                .payload(objectMapper.writeValueAsString(event))
-                .attempts(0)
-                .build();
-
-        paymentOutboxRepository.save(outbox);
+        paymentOutboxRepository.save(outboxEvent(payment, Map.of(
+                "paymentId", payment.getId(),
+                "amount", payment.getAmountRub(),
+                "payerId", payer.getId(),
+                "recipientId", recipient.getId()
+        )));
 
         return paymentMapper.toResponse(payment, feeEntity);
+    }
+
+    private String toJson(Object obj) {
+        try{
+            return objectMapper.writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Не удалось сериализовать outbox payload", e);
+        }
+    }
+
+    private PaymentOutbox outboxEvent(Payment payment, Map<String, Object> payload) {
+        return PaymentOutbox.builder()
+                .aggregateId(payment.getId())
+                .eventId(UUID.randomUUID())
+                .eventType("PAYMENT_CREATED")
+                .payload(toJson(payload))
+                .createdAt(Instant.now())
+                .publishedAt(null)
+                .attempts(0)
+                .lastError(null)
+                .build();
     }
 
     private void validateUsers(User payer, User recipient) {

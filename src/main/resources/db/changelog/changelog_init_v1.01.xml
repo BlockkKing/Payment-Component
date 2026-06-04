@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog">
+
+    <changeSet id="create-table-payment" author="master">
+        <createTable tableName="payment" schemaName="ms_payment_component">
+            <column name="id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="payer_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="recipient_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="amount_rub" type="numeric" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="booking_date" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="external_id" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-table-fee" author="master">
+        <createTable tableName="fee" schemaName="ms_payment_component">
+            <column name="fee_amount" type="numeric(19,2)" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="payment_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-table-user" author="master">
+        <createTable tableName="user" schemaName="ms_payment_component">
+            <column name="id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="varchar">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="create-table-payment-outbox" author="master">
+        <createTable tableName="payment_outbox" schemaName="ms_payment_component">
+            <column name="id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="attempts" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="aggregate_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="published_at" type="timestamp"/>
+            <column name="event_id" type="uuid"/>
+            <column name="attempts" type="int" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_error" type="varchar(4000)"/>
+            <column name="event_type" type="varchar(255)"/>
+            <column name="payload" type="text"/>
+        </createTable>
+
+        <createIndex indexName="idx_outbox_published_at" tableName="payment_outbox" schemaName="ms_payment_component">
+            <column name="published_at"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

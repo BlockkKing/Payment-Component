@@ -40,7 +40,7 @@ public class PaymentOutbox {
     @Column(name = "attempts", nullable = false)
     private int attempts; // защита от бесконечных retry
 
-    @Column(name = "last_error")
+    @Column(name = "last_error", length = 4000)
     private String lastError; // хранит последнюю ошибку отправки
 
     // гарантия уникального uuid, если забыли задать
@@ -48,10 +48,6 @@ public class PaymentOutbox {
     void prePersist() {
         if (eventId == null) {
             eventId = UUID.randomUUID();
-        }
-
-        if (createdAt == null) {
-            createdAt = Instant.now();
         }
     }
 }
