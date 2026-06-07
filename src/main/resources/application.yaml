@@ -12,7 +12,7 @@ spring:
     name: payment-component
 
   jpa:
-    defer-datasource-initialization: true
+    defer-datasource-initialization: false
     open-in-view: false
     hibernate:
       ddl-auto: none
@@ -23,7 +23,7 @@ spring:
 
   liquibase:
     enabled: true
-    change-log: classpath:db/database_ms_payment-changelog.xml
+    change-log: classpath:db/changelog/changelog_init_v1.01.xml
     default-schema: ms_payment_component
     drop-first: false
 
