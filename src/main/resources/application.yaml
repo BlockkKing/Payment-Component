@@ -35,6 +35,16 @@ spring:
       repositories:
         enabled: false
 
+payment:
+  idempotency:
+    # Окно, в течение которого повторный вызов /pay БЕЗ заголовка Idempotency-Key
+    # будет считаться ретраем и вернёт тот же результат.
+    ttl-seconds: ${PAYMENT_IDEMPOTENCY_TTL_SECONDS:600}
+  provider:
+    mock:
+      # Для проверки FAIL-сценария: при fail-mod=5 упадут заказы 5,10,15,...
+      fail-mod: ${PAYMENT_MOCK_FAIL_MOD:5}
+
 kafka:
   payment-events-topic: ${PAYMENT_EVENTS_TOPIC:payment-events}
 

@@ -20,7 +20,8 @@ public class PaymentMapper {
         return new PaymentResponse(
                 payment.getId(),
                 payment.getAmountRub(),
-                fee != null ? fee.getAmount() : null
+                fee != null ? fee.getAmount() : null,
+                payment.getIdempotencyKey()
         );
     }
 }
