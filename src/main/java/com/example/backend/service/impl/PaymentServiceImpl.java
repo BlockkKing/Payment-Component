@@ -35,9 +35,15 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentOutboxRepository paymentOutboxRepository;
     private final ObjectMapper objectMapper;
 
+    private final IdempotencyService idempotencyService;
+
     @Override
     @Transactional
-    public PaymentResponse pay(PaymentRequest request) {
+    public PaymentResponse pay(String idempotencyKey, PaymentRequest request) {
+        // Если клиент не передал Idempotency-Key — сгенерируем и запомним по orderId на короткое время.
+        // Это позволяет повторить запрос без заголовка (например после сетевого таймаута) и получить тот же результат.
+        String resolvedIdemKey = idempotencyService.getOrCreate(request.getOrderId(), idempotencyKey);
+
         // 1. Получить отправителя
         //User payer = findUser(request.payerId());
         User payer = userService.findById(request.getPayerId());

@@ -51,57 +51,57 @@ public class PaymentServiceImplTest {
 
     private PaymentMapper paymentMapper = new PaymentMapper();
 
-    private PaymentServiceImpl paymentService;
-    @BeforeEach
-    @Disabled("ban")
-    void setUp() {
-        paymentService = new PaymentServiceImpl(
-                userService,
-                exchangeRateService,
-                feePolicyService,
-                paymentRepository,
-                feeService,
-                eventPublisher,
-                paymentMapper
-        );
-    }
-
-    @Test
-    @Disabled("ban")
-    void shouldCalculatePaymentCorrectly() {
-        Long payerId = 1L;
-        Long recipientId = 2L;
-        PaymentRequest request = new PaymentRequest(
-                new BigDecimal("100"),
-                "USD",
-                recipientId,
-                payerId
-        );
-
-        User payer = new User();
-        payer.setId(payerId);
-
-        User recipient = new User();
-        recipient.setId(recipientId);
-
-        Payment payment = new Payment(); //подготовка оружения
-        Fee fee = new Fee();
-        fee.setAmount(new BigDecimal("45.00"));
-
-        when(userService.findById(payerId)).thenReturn(payer);
-        when(userService.findById(recipientId)).thenReturn(recipient);
-        when(exchangeRateService.getExchangeRate("USD", "RUB"))
-                .thenReturn(new BigDecimal("90"));
-        when(feePolicyService.calculateFee(any()))
-                .thenReturn(new BigDecimal("45.00"));
-        when(paymentRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
-        when(feeService.createFee(any(), any(), any())).thenReturn(fee);
-        PaymentResponse result = paymentService.pay(request);
-
-        System.out.println("Amount РУБ: " + result.getAmountRub());
-        System.out.println("Fee = " + result.getFee());
-
-        assertEquals(new BigDecimal("9000.00"), result.getAmountRub());
-        assertEquals(new BigDecimal("45.00"), result.getFee());
-    }
+//    private PaymentServiceImpl paymentService;
+//    @BeforeEach
+//    @Disabled("ban")
+//    void setUp() {
+//        paymentService = new PaymentServiceImpl(
+//                userService,
+//                exchangeRateService,
+//                feePolicyService,
+//                paymentRepository,
+//                feeService,
+//                eventPublisher,
+//                paymentMapper
+//        );
+//    }
+//
+//    @Test
+//    @Disabled("ban")
+//    void shouldCalculatePaymentCorrectly() {
+//        Long payerId = 1L;
+//        Long recipientId = 2L;
+//        PaymentRequest request = new PaymentRequest(
+//                new BigDecimal("100"),
+//                "USD",
+//                recipientId,
+//                payerId
+//        );
+//
+//        User payer = new User();
+//        payer.setId(payerId);
+//
+//        User recipient = new User();
+//        recipient.setId(recipientId);
+//
+//        Payment payment = new Payment(); //подготовка оружения
+//        Fee fee = new Fee();
+//        fee.setAmount(new BigDecimal("45.00"));
+//
+//        when(userService.findById(payerId)).thenReturn(payer);
+//        when(userService.findById(recipientId)).thenReturn(recipient);
+//        when(exchangeRateService.getExchangeRate("USD", "RUB"))
+//                .thenReturn(new BigDecimal("90"));
+//        when(feePolicyService.calculateFee(any()))
+//                .thenReturn(new BigDecimal("45.00"));
+//        when(paymentRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+//        when(feeService.createFee(any(), any(), any())).thenReturn(fee);
+//        PaymentResponse result = paymentService.pay(request);
+//
+//        System.out.println("Amount РУБ: " + result.getAmountRub());
+//        System.out.println("Fee = " + result.getFee());
+//
+//        assertEquals(new BigDecimal("9000.00"), result.getAmountRub());
+//        assertEquals(new BigDecimal("45.00"), result.getFee());
+//    }
 }
