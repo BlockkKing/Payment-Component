@@ -42,7 +42,11 @@ public class PaymentServiceImpl implements PaymentService {
     public PaymentResponse pay(String idempotencyKey, PaymentRequest request) {
         // Если клиент не передал Idempotency-Key — сгенерируем и запомним по orderId на короткое время.
         // Это позволяет повторить запрос без заголовка (например после сетевого таймаута) и получить тот же результат.
-        String resolvedIdemKey = idempotencyService.getOrCreate(request.getOrderId(), idempotencyKey);
+        String resolvedIdemKey = idempotencyService.getOrCreate(request.getPayerId(), request.getRecipientId(), idempotencyKey);
+        var existing = paymentRepository.findByIdempotencyKey(resolvedIdemKey);
+        if (existing.isPresent()) {
+            return toResponse(existing.get());
+        }
 
         // 1. Получить отправителя
         //User payer = findUser(request.payerId());
@@ -62,6 +66,8 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setRecipient(recipient);
         payment.setAmountRub(amountRub);
         payment.setBookingDate(LocalDateTime.now());
+        payment.setExternalId(UUID.randomUUID().toString());
+        payment.setIdempotencyKey(resolvedIdemKey);
         payment = paymentRepository.save(payment);
         // 7. Сохранение комиссии
         Fee feeEntity = feeService.createFee(payer, payment, fee);
@@ -107,5 +113,13 @@ public class PaymentServiceImpl implements PaymentService {
         BigDecimal rate = exchangeRateService.getExchangeRate(currency, "RUB");
         return amount.multiply(rate)
                 .setScale(2, RoundingMode.HALF_UP);
+    }
+
+    private PaymentResponse toResponse(Payment p) {
+        return PaymentResponse.builder()
+                .paymentId(p.getId())
+                .amountRub(p.getAmountRub())
+                .idempotencyKey(p.getIdempotencyKey())
+                .build();
     }
 }

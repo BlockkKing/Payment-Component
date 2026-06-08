@@ -8,7 +8,7 @@ http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbch
 
     <changeSet id="create-table-payment" author="master">
         <createTable tableName="payment" schemaName="ms_payment_component">
-            <column name="id" type="bigint">
+            <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="payer_id" type="bigint">
@@ -31,7 +31,7 @@ http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbch
 
     <changeSet id="create-table-fee" author="master">
         <createTable tableName="fee" schemaName="ms_payment_component">
-            <column name="id" type="bigint">
+            <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="payment_id" type="bigint">
@@ -48,7 +48,7 @@ http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbch
 
     <changeSet id="create-table-user" author="master">
         <createTable tableName="user" schemaName="ms_payment_component">
-            <column name="id" type="bigint">
+            <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="name" type="varchar">
@@ -59,7 +59,7 @@ http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbch
 
     <changeSet id="create-table-payment-outbox" author="master">
         <createTable tableName="payment_outbox" schemaName="ms_payment_component">
-            <column name="id" type="bigint">
+            <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="attempts" type="bigint">
@@ -81,6 +81,12 @@ http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbch
         <createIndex indexName="idx_outbox_published_at" tableName="payment_outbox" schemaName="ms_payment_component">
             <column name="published_at"/>
         </createIndex>
+    </changeSet>
+
+    <changeSet id="create-idempotency-key" author="master">
+        <addColumn tableName="payment" schemaName="ms_payment_component">
+            <column name="idempotency_key" type="varchar"/>
+        </addColumn>
     </changeSet>
 
 </databaseChangeLog>

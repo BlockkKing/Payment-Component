@@ -32,6 +32,9 @@ public class Payment {
     @JoinColumn(name = "recipient_id", nullable = false)
     private User recipient;
 
+    @Column(name = "idempotency_key", nullable = false, length = 128)
+    private String idempotencyKey;
+
     @Column(name = "booking_date", nullable = false, updatable = false)
     private LocalDateTime bookingDate;
 
